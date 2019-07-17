@@ -74,9 +74,11 @@ NotificationListener<ScrollNotification>(
 * `layoutWidth` - The ad is wrapped in a Container. This is it's width. Must be positive!
 * `layoutHeight` - The ad is wrapped in a Container. This is it's height. Must be positive!
 * `loadMode` - When would you like to load the ad. More info below.
+
 and a pair of
 * `memberId` - The member id that this AdView belongs to.
 * `inventoryCode` - The inventory code provides a more human readable way to identify the location in your application where ads will be shown.
+
 or
 * `placementID` - The placement ID associated with your app's inventory.
 
