@@ -1,0 +1,22 @@
+name: flutter_appnexus
+description: Flutter plugin for AppNexus SDK
+version: 0.0.1
+author: OmniNext team @ Schibsted
+homepage:
+
+environment:
+  sdk: ">=2.2.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  rxdart: ^0.22.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: com.schibsted.flutter.flutter_appnexus
+    pluginClass: FlutterAppnexusPlugin
