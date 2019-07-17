@@ -9,7 +9,7 @@ Flutter plugin for AppNexus SDK
 ### BannerAdView
 Widget that shows AppNexus Banners https://wiki.appnexus.com/display/sdk/Show+Banners
 
-|||
+|Scroll trigger example|Async trigger example|
 |-|-|
 |![scroll trigger](demo/scroll_trigger.gif)|![async trigger](demo/async_trigger.gif)|
 
