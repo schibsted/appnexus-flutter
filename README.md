@@ -96,7 +96,7 @@ or
   * `LoadWhenTriggered` - you trigger the ad loading via a Stream
   * `WhenScrolledToAd` - `ScrollNotification` is used to trigger ad loading
 
-* `adListener` - Widget passes some AdListener events from native code described [here](https://wiki.appnexus.com/display/sdk/Receive+Ad+View+Status+Events) via `AdListenerEvent` events. Just provide the `Sink<AdListenerEvent>` to `adListener` constructor property. Supported events `AdClicked`, `AdRequestFailed`, `AdLoaded`.
+* `adListener` - register ad listener which correspond to native code described [here](https://wiki.appnexus.com/display/sdk/Receive+Ad+View+Status+Events) via `AdListenerEvent` events. Just provide the `Sink<AdListenerEvent>` to `adListener` constructor property. Supported events `AdClicked`, `AdRequestFailed`, `AdLoaded`.
 
 * `clickThroughAction` - how the clicked ad is opened:
   * `OpenDeviceBrowser` - opens the ad in the device browser
