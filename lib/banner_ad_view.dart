@@ -23,7 +23,7 @@ import 'package:flutter_appnexus/models/load_mode.dart';
 /// Widget supports different load modes via the [loadMode] parameter:
 /// * [LoadWhenCreated] - automatically loads ad after creating the view in native code
 /// * [LoadWhenTriggered] - you trigger the ad loading via a Stream
-/// * [WhenScrolledToAd] - [ScrollNotification] is used to trigger ad loading
+/// * [WhenInViewport] - Ad loading is dependent if it's in the viewport
 ///
 /// Widget passes AdListener events from native code described here: https://wiki.appnexus.com/display/sdk/Receive+Ad+View+Status+Events via [AdListenerEvent]
 /// events. Just provide the [Sink<AdListenerEvent>] to [adListener] constructor property
@@ -108,15 +108,12 @@ class BannerAdViewState extends State<BannerAdView> with AutomaticKeepAliveClien
 
   @override
   void initState() {
+    context.toString();
     if (widget.loadMode is LoadWhenCreated) {
       loading = true;
-    } else if (widget.loadMode is WhenScrolledToAd) {
-      (widget.loadMode as WhenScrolledToAd)
-          .scrollNotificationSubject
-          ?.bufferTime(const Duration(milliseconds: 100))
-          ?.where((batch) => batch.isNotEmpty)
-          ?.listen((scrollNotification) {
-        _onScroll(scrollNotification, (widget.loadMode as WhenScrolledToAd).pixelOffset);
+    } else if (widget.loadMode is WhenInViewport) {
+      (widget.loadMode as WhenInViewport).checkIfInViewport?.listen((_) {
+        _checkViewport((widget.loadMode as WhenInViewport).pixelOffset);
       });
     } else if (widget.loadMode is LoadWhenTriggered) {
       (widget.loadMode as LoadWhenTriggered).triggerAdLoading?.listen((_) {
@@ -136,28 +133,24 @@ class BannerAdViewState extends State<BannerAdView> with AutomaticKeepAliveClien
     }
   }
 
-  /// function used only with the [WhenScrolledToAd] loadMode
-  void _onScroll(List<ScrollNotification> notifications, int pixelOffset) {
-    new Future.delayed(Duration.zero, () {
-      if (context == null) return;
-      final RenderObject object = context.findRenderObject();
+  /// function used only with the [WhenInViewport] loadMode
+  void _checkViewport(int pixelOffset) {
+    if (context == null) return;
+    final RenderObject object = context.findRenderObject();
 
-      if (object == null || !object.attached) {
-        return;
-      }
+    if (object == null || !object.attached) {
+      return;
+    }
 
-      final RenderAbstractViewport viewport = RenderAbstractViewport.of(object);
-      final double vpHeight = viewport.paintBounds.height;
-      final ScrollableState scrollableState = Scrollable.of(context);
-      final ScrollPosition scrollPosition = scrollableState.position;
-      final RevealedOffset vpOffset = viewport.getOffsetToReveal(object, 0.0);
+    final RenderAbstractViewport viewport = RenderAbstractViewport.of(object);
+    final double vpHeight = viewport.paintBounds.height;
+    final RevealedOffset vpOffset = viewport.getOffsetToReveal(object, 0.0);
 
-      final double deltaTop = vpOffset.offset - scrollPosition.pixels;
+    final double deltaTop = vpOffset.offset - Scrollable.of(context).position.pixels;
 
-      if ((vpHeight - deltaTop) > pixelOffset) {
-        loadAd();
-      }
-    });
+    if ((vpHeight - deltaTop) > pixelOffset) {
+      loadAd();
+    }
   }
 
   /// Offstage is used to show the ad only if it loads (if a error occurs, no empty space will be added to your widget tree).
@@ -216,9 +209,6 @@ class BannerAdViewState extends State<BannerAdView> with AutomaticKeepAliveClien
 
   @override
   void dispose() {
-    if (widget.loadMode is WhenScrolledToAd) {
-      (widget.loadMode as WhenScrolledToAd).scrollNotificationSubject.close();
-    }
     widget.adListener?.close();
     super.dispose();
   }

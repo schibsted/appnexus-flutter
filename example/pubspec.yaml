@@ -17,6 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   toast: ^0.1.5
+  rxdart: ^0.22.0
 
   flutter_appnexus:
     path: ../

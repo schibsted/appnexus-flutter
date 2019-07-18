@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appnexus_example/when_created_example.dart';
-import 'package:flutter_appnexus_example/when_scrolled_to_example.dart';
+import 'package:flutter_appnexus_example/when_in_viewport_example.dart';
 import 'package:flutter_appnexus_example/when_triggered_example.dart';
 
 void main() => runApp(MaterialApp(home: BannerAdViewExamples()));
@@ -17,7 +17,7 @@ class BannerAdViewExamples extends StatelessWidget {
           children: [
             buildButton(context, WhenTriggeredExample(), "Load when triggered"),
             buildButton(context, WhenCreatedExample(), "Load when created"),
-            buildButton(context, WhenScrolledToExample(), "Load when scrolled to with -100 px offset"),
+            buildButton(context, WhenInViewportExample(), "Load when -100 px before in viewport"),
           ],
         ),
       ),

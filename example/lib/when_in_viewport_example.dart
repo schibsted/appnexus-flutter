@@ -7,21 +7,24 @@ import 'package:rxdart/rxdart.dart';
 import 'package:toast/toast.dart';
 
 /// This example demonstrates loading the ad 100 px before appearing on screen while scrolling.
-class WhenScrolledToExample extends StatefulWidget {
+class WhenInViewportExample extends StatefulWidget {
   @override
-  _WhenScrolledToExampleState createState() => _WhenScrolledToExampleState();
+  _WhenInViewportExampleState createState() => _WhenInViewportExampleState();
 }
 
-class _WhenScrolledToExampleState extends State<WhenScrolledToExample> {
+class _WhenInViewportExampleState extends State<WhenInViewportExample> {
   List<Widget> items;
-  PublishSubject<ScrollNotification> _scrollNotifications;
+  // rxdart is used to sample the data
+  PublishSubject<ScrollNotification> _scrollNotificationsSubject = PublishSubject<ScrollNotification>();
+  StreamController _checkIfAdIsInViewport = StreamController();
   final adListener = StreamController<AdListenerEvent>();
 
   @override
   void initState() {
     super.initState();
-    _scrollNotifications = PublishSubject<ScrollNotification>();
-
+    _scrollNotificationsSubject.sampleTime(Duration(milliseconds: 100)).listen((onScroll) {
+      _checkIfAdIsInViewport.sink.add(null);
+    });
     items = [
       Container(height: 200, color: Colors.blueAccent),
       Container(height: 200, color: Colors.pink),
@@ -64,7 +67,7 @@ class _WhenScrolledToExampleState extends State<WhenScrolledToExample> {
         shouldServePSAs: true,
         placementID: "9924002",
         clickThroughAction: ClickThroughAction.openSdkBrowser(),
-        loadMode: LoadMode.whenScrolledToAd(_scrollNotifications, -100),
+        loadMode: LoadMode.whenInViewport(_checkIfAdIsInViewport.stream, -100),
         adListener: adListener,
       ),
     );
@@ -89,8 +92,8 @@ class _WhenScrolledToExampleState extends State<WhenScrolledToExample> {
         color: Colors.yellow,
         child: NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scroll) {
-            if (!_scrollNotifications.isClosed) {
-              _scrollNotifications.add(scroll);
+            if (!_scrollNotificationsSubject.isClosed) {
+              _scrollNotificationsSubject.add(scroll);
             }
             return true;
           },
@@ -106,7 +109,8 @@ class _WhenScrolledToExampleState extends State<WhenScrolledToExample> {
 
   @override
   void dispose() {
-    _scrollNotifications?.close();
+    _scrollNotificationsSubject?.close();
+    _checkIfAdIsInViewport?.close();
     adListener?.close();
     super.dispose();
   }

@@ -9,9 +9,9 @@ Flutter plugin for AppNexus SDK
 ### BannerAdView
 Widget that shows AppNexus Banners https://wiki.appnexus.com/display/sdk/Show+Banners
 
-|Scroll trigger example|Async trigger example|
+|Async trigger example|Viewport trigger example|
 |-|-|
-|![scroll trigger](demo/scroll_trigger.gif)|![async trigger](demo/async_trigger.gif)|
+|![async trigger](demo/async_trigger.gif)|![viewport_trigger](demo/viewport_trigger.gif)|
 
 ### Usage
 
@@ -34,21 +34,18 @@ BannerAdView(
 
 More complex example to show AppNexus Banner, that:
 - has a listener
-- is triggered by a scroll
+- is triggered asynchronously and loads when it's -100px before showing in the viewport
 - opens in the AppNexus SDK browser
 - uses a custom `adWidth` and `adHeight` set to `1` and passed to the
   [setAdSize](https://wiki.appnexus.com/display/ST/BannerAdView#setAdSize-int-int-) function
 - shows in a Container widget with height = 250 and width = 300
 - shows Public Service Announcements ads
 ```
-import 'package:rxdart/rxdart.dart';
+// Adding an item to this Stream will trigger checking if the BannerAdView is in the viewport (+- pixelOffset). 
+// Usually the items will be produced by a NotificationListener<ScrollNotification> widget.
+StreamController _checkIfInViewport = StreamController();
 
-...
-
-_scrollNotifications = PublishSubject<ScrollNotification>();
-
-...
-
+[...]
 var bannerView = BannerAdView(
   adHeight = 1,
   adWidth = 1,
@@ -57,21 +54,9 @@ var bannerView = BannerAdView(
   shouldServePSAs: true,
   placementID: "9924002",
   clickThroughAction: ClickThroughAction.openSdkBrowser(),
-  loadMode: LoadMode.whenScrolledToAd(_scrollNotifications, -100),
+  loadMode: LoadMode.whenInViewport(_checkIfInViewport, -100),
   adListener: adListener,
   )
-
-...
-
-NotificationListener<ScrollNotification>(
-  onNotification: (ScrollNotification scroll) {
-    if (!_scrollNotifications.isClosed) {
-      _scrollNotifications.add(scroll);
-    }
-    return true;
-    },
-  child: <bannerView somewhere in the tree below>
-)
 ```
 
 #### Required constructor parameters:
